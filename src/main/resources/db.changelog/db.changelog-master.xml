@@ -1,0 +1,58 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Lukáš Křečan" id="01">
+        <sql>CREATE TYPE kafka_message_status AS ENUM('PENDING', 'SENT', 'FAILED')</sql>
+
+        <createTable tableName="kafka_outboxes">
+            <column name="id" type="BIGSERIAL">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="subject" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="topic" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="partition_key" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="schema_version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="headers" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="encoded_message_bytesize" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="kafka_message_status">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error" type="VARCHAR">
+                <constraints nullable="true"/>
+            </column>
+            <column name="confirmed_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="offset" type="BIGINT"/>
+            <column name="partition" type="INT"/>
+        </createTable>
+
+        <createIndex tableName="kafka_outboxes" indexName="idx_kafka_outboxes_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
